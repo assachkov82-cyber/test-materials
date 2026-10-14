@@ -1,0 +1,794 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Форма Бамбук</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: six full-width screens stacked in order; a fixed "culm" rail on the left marks the current screen with a node.
+   Content sits in a 1240px column; the model board, the advantages band and the showroom break out to full bleed. */
+:root{
+  --bg:#0E130F; --bg2:#151C16; --bg3:#1E271F;
+  --fg:#EFE7D3; --fg2:#A9A48F; --fg3:#6F6E60;
+  --line:rgba(239,231,211,.14); --line2:rgba(239,231,211,.28);
+  --straw:#D9B16B; --straw2:#B98F47; --straw-ink:#2A1F0C;
+  --shoot:#A6D65C;
+  --felt:#0A0C0A; --on-media:#F4EEDF; --on-media2:rgba(244,238,223,.72);
+  --card:#141B15; --input:#0B100C; --bg-a:rgba(14,19,15,.8); --danger:#E8776F;
+  --shadow:0 24px 60px rgba(0,0,0,.45);
+  --display:'Unbounded','Arial Black',Impact,sans-serif;
+  --body:'Golos Text','Helvetica Neue',Arial,sans-serif;
+  --mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EEF0E6; --bg2:#E3E7D8; --bg3:#D6DBC9;
+    --fg:#141A14; --fg2:#5B6355; --fg3:#8A9080;
+    --line:rgba(20,26,20,.14); --line2:rgba(20,26,20,.3);
+    --straw:#9A7320; --straw2:#7A5912; --straw-ink:#FFF6E2;
+    --shoot:#4E8A1C;
+    --card:#F6F7F1; --input:#FFFFFF; --bg-a:rgba(238,240,230,.84); --danger:#B3261E;
+    --shadow:0 24px 50px rgba(30,40,20,.18);
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EEF0E6; --bg2:#E3E7D8; --bg3:#D6DBC9;
+  --fg:#141A14; --fg2:#5B6355; --fg3:#8A9080;
+  --line:rgba(20,26,20,.14); --line2:rgba(20,26,20,.3);
+  --straw:#9A7320; --straw2:#7A5912; --straw-ink:#FFF6E2;
+  --shoot:#4E8A1C;
+  --card:#F6F7F1; --input:#FFFFFF; --bg-a:rgba(238,240,230,.84); --danger:#B3261E;
+  --shadow:0 24px 50px rgba(30,40,20,.18);
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,video{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.05;letter-spacing:-.01em;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1240px;margin-inline:auto;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+:focus-visible{outline:2px solid var(--shoot);outline-offset:3px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- top bar ---------- */
+.top{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:40;display:flex;align-items:center;gap:24px;padding:14px var(--gutter-r) 14px var(--gutter-l);background:linear-gradient(to bottom,rgba(10,12,10,.72),rgba(10,12,10,0));pointer-events:none}
+.top>*{pointer-events:auto}
+.mark{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:.14em;text-decoration:none;color:var(--on-media);display:flex;align-items:center;gap:10px}
+.mark i{display:inline-block;width:10px;height:26px;border-radius:5px;background:var(--straw);box-shadow:inset 0 9px 0 -8px var(--felt),inset 0 -9px 0 -8px var(--felt)}
+.nav{display:flex;gap:4px;margin-left:auto;font-family:var(--mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+.nav a{color:var(--on-media2);text-decoration:none;padding:8px 10px;border-radius:999px;transition:color .2s,background .2s}
+.nav a:hover,.nav a.is-active{color:var(--on-media);background:rgba(244,238,223,.1)}
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;cursor:pointer;text-decoration:none;font-family:var(--mono);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:999px;transition:transform .15s,background .2s,color .2s,box-shadow .2s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--straw);color:var(--straw-ink)}
+.btn-primary:hover{background:var(--straw2);color:var(--straw-ink)}
+.btn-ghost{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line2)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--straw);color:var(--straw)}
+.btn-media{background:rgba(244,238,223,.12);color:var(--on-media);backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(244,238,223,.25)}
+.btn-media:hover{background:rgba(244,238,223,.22)}
+.top .btn{padding:10px 16px;margin-left:auto}
+.top.is-scrolled{background:var(--bg-a);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line)}
+.top.is-scrolled .mark{color:var(--fg)}
+.top.is-scrolled .nav a{color:var(--fg2)}
+.top.is-scrolled .nav a:hover,.top.is-scrolled .nav a.is-active{color:var(--fg);background:var(--bg3)}
+@media (max-width:900px){.nav{display:none}}
+
+/* ---------- culm rail ---------- */
+.rail{position:fixed;left:calc(var(--gutter-l) + 6px);top:50%;transform:translateY(-50%);z-index:30;display:none;flex-direction:column;gap:0;align-items:center}
+@media (min-width:1100px){.rail{display:flex}}
+.rail a{position:relative;display:block;width:22px;height:46px;text-decoration:none;color:var(--fg3)}
+.rail a::before{content:"";position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--line2);border-radius:2px}
+.rail a::after{content:"";position:absolute;left:5px;top:18px;width:12px;height:10px;border-radius:6px;background:var(--bg);box-shadow:inset 0 0 0 2px var(--line2);transition:background .25s,box-shadow .25s,transform .25s}
+.rail a span{position:absolute;left:34px;top:12px;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;white-space:nowrap;opacity:0;transform:translateX(-6px);transition:opacity .2s,transform .2s;color:var(--fg2)}
+.rail a:hover span,.rail a.is-active span{opacity:1;transform:none}
+.rail a.is-active::after{background:var(--straw);box-shadow:inset 0 0 0 2px var(--straw);transform:scaleX(1.25)}
+.rail a.is-active{color:var(--straw)}
+
+/* ---------- screens ---------- */
+.screen{position:relative;padding-block:clamp(72px,10vw,128px)}
+.eyebrow{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--straw)}
+.eyebrow b{font-weight:500;color:var(--fg3)}
+.eyebrow::after{content:"";width:48px;height:1px;background:var(--straw);opacity:.6}
+.lead{font-size:clamp(1.05rem,1.4vw,1.25rem);color:var(--fg2);max-width:58ch}
+.h2{font-size:clamp(2rem,4.6vw,4rem);font-weight:600;margin-top:18px}
+.head{display:grid;gap:22px;margin-bottom:clamp(36px,5vw,64px)}
+.culms{position:absolute;inset:0;pointer-events:none;background:
+  repeating-linear-gradient(90deg,transparent 0 118px,var(--line) 118px 119px);mask-image:linear-gradient(to bottom,transparent,black 20%,black 80%,transparent);-webkit-mask-image:linear-gradient(to bottom,transparent,black 20%,black 80%,transparent);opacity:.5}
+
+/* ---------- 01 hero ---------- */
+.hero{min-height:min(92svh,860px);display:flex;align-items:flex-end;padding-block:0;padding-top:120px;overflow:hidden;background:var(--felt);color:var(--on-media)}
+.hero .media{position:absolute;inset:0}
+.hero video,.hero .still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.95)}
+.hero .veil{position:absolute;inset:0;background:
+  linear-gradient(to top,var(--bg) 0%,rgba(10,12,10,.74) 34%,rgba(10,12,10,.5) 72%,rgba(10,12,10,.62) 100%)}
+.hero .wrap{position:relative;width:100%;padding-bottom:clamp(40px,6vw,72px)}
+.hero h1{font-size:clamp(2.6rem,7.2vw,6.6rem);font-weight:800;letter-spacing:-.025em;max-width:14ch;text-shadow:0 2px 30px rgba(0,0,0,.55)}
+.hero h1 em{font-style:normal;color:#E4BF74}
+.hero .lead{color:var(--on-media2);margin-top:22px}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.hero .facts{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:clamp(20px,5vw,64px);margin-top:clamp(36px,6vw,72px);padding-top:26px;border-top:1px solid rgba(244,238,223,.22)}
+.hero .facts div{display:grid;gap:4px}
+.hero .facts strong{font-family:var(--display);font-size:clamp(1.1rem,2.2vw,1.7rem);font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.hero .facts span{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-media2)}
+.hero .reveal{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.hero .reveal:nth-child(2){animation-delay:.08s}.hero .reveal:nth-child(3){animation-delay:.16s}.hero .reveal:nth-child(4){animation-delay:.24s}.hero .reveal:nth-child(5){animation-delay:.32s}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media (max-width:560px){.hero .facts{grid-template-columns:1fr 1fr;gap:18px}}
+
+/* ---------- 02 models ---------- */
+.models{background:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:0;cursor:pointer;font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;padding:9px 14px;border-radius:999px;background:transparent;color:var(--fg2);box-shadow:inset 0 0 0 1px var(--line2);transition:all .2s}
+.chip:hover{color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg2)}
+.chip.is-on{background:var(--straw);color:var(--straw-ink);box-shadow:none}
+.picked{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:22px;padding:14px 18px;border-radius:14px;background:var(--bg2);font-size:.95rem}
+.picked b{font-family:var(--display);font-weight:600;font-size:.95rem}
+.picked .price{font-family:var(--mono);color:var(--straw);font-variant-numeric:tabular-nums}
+.picked a{margin-left:auto;font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--straw);text-decoration:none}
+.picked a:hover{text-decoration:underline}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:28px}
+@media (max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:720px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}}
+.card{position:relative;display:grid;grid-template-rows:auto 1fr;gap:0;background:var(--card);border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line);transition:box-shadow .2s,transform .2s;min-width:0}
+.card:hover{transform:translateY(-3px);box-shadow:inset 0 0 0 1px var(--line2),var(--shadow)}
+.card.is-picked{box-shadow:inset 0 0 0 2px var(--straw),var(--shadow)}
+.card figure{margin:0;aspect-ratio:4/5;max-width:100%;overflow:hidden;position:relative;background:var(--bg3)}
+.card img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.card:hover img{transform:scale(1.05)}
+.card .tag{position:absolute;left:12px;top:12px;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:999px;background:rgba(10,12,10,.62);color:var(--on-media);backdrop-filter:blur(6px)}
+.card .ok{position:absolute;right:12px;top:12px;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border-radius:999px;background:var(--straw);color:var(--straw-ink);display:none}
+.card.is-picked .ok{display:block}
+.card .body{display:grid;gap:8px;padding:14px 14px 16px}
+.card h3{font-size:.98rem;font-weight:600;letter-spacing:0}
+.card .meta{font-family:var(--mono);font-size:.72rem;color:var(--fg2);line-height:1.5}
+.card .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}
+.card .p{font-family:var(--display);font-size:.98rem;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.card .p small{font-family:var(--mono);font-weight:400;font-size:.68rem;color:var(--fg2)}
+.card .pick{border:0;cursor:pointer;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--line2);color:var(--fg);transition:all .2s}
+.card .pick:hover{background:var(--straw);color:var(--straw-ink);box-shadow:none}
+.card.is-picked .pick{background:var(--straw);color:var(--straw-ink);box-shadow:none}
+@media (max-width:720px){.card .row{flex-direction:column;align-items:flex-start}.card .pick{width:100%;justify-content:center;text-align:center}.card .body{padding:12px}}
+.note{font-family:var(--mono);font-size:.74rem;color:var(--fg3);margin-top:18px;line-height:1.6}
+
+/* ---------- 03 specs ---------- */
+.specs{background:var(--bg2)}
+.specs .cols{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,5vw,72px);align-items:start}
+@media (max-width:900px){.specs .cols{grid-template-columns:1fr}}
+.sheet{display:grid;gap:0;border-top:1px solid var(--line2)}
+.sheet div{display:grid;grid-template-columns:minmax(120px,.8fr) 1.2fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);min-width:0}
+.sheet dt{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);padding-top:3px}
+.sheet dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
+.sheet dd small{display:block;font-weight:400;color:var(--fg2);font-size:.88rem;margin-top:2px}
+.section-svg{width:100%;height:auto;display:block}
+.section-svg .lam{fill:var(--straw)}
+.section-svg .lam2{fill:var(--straw2)}
+.section-svg .base{fill:var(--bg3);stroke:var(--line2)}
+.section-svg .felt{fill:var(--felt)}
+.section-svg .coat{fill:var(--shoot);opacity:.85}
+.section-svg .lead{stroke:var(--fg2);stroke-width:1;fill:none}
+.section-svg text{font-family:var(--mono);font-size:11px;fill:var(--fg);letter-spacing:.04em}
+.section-svg .dim{fill:var(--fg2)}
+.section-svg .dot{fill:var(--straw)}
+.closeup{margin-top:26px;position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/10;max-width:100%;background:var(--bg3);box-shadow:var(--shadow)}
+.closeup video{width:100%;height:100%;object-fit:cover}
+.closeup .cap{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-media);padding:7px 10px;border-radius:999px;background:rgba(10,12,10,.55);backdrop-filter:blur(6px)}
+.conds{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:clamp(36px,5vw,64px)}
+@media (max-width:900px){.conds{grid-template-columns:repeat(2,1fr)}}
+.cond{padding:18px 18px 16px;border-radius:14px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);min-width:0}
+.cond strong{display:block;font-family:var(--display);font-size:clamp(1.3rem,2.4vw,1.9rem);font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.cond span{display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);margin-top:8px;line-height:1.5}
+
+/* ---------- 04 advantages ---------- */
+.adv{background:var(--felt);color:var(--on-media);overflow:hidden;padding-block:0}
+.adv .bgs{position:absolute;inset:0}
+.adv .bgs video,.adv .bgs img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease}
+.adv .bgs .is-on{opacity:1}
+.adv .bgs::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,12,10,.92) 0%,rgba(10,12,10,.78) 45%,rgba(10,12,10,.45) 100%)}
+.adv .wrap{position:relative;display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(28px,5vw,80px);padding-block:clamp(72px,10vw,128px)}
+@media (max-width:980px){.adv .wrap{grid-template-columns:1fr}}
+.adv .eyebrow{color:var(--straw)}.adv .eyebrow b{color:var(--on-media2)}
+.adv .lead{color:var(--on-media2)}
+.adv .sticky{position:sticky;top:120px;align-self:start}
+.nodes{list-style:none;margin:0;padding:0;display:grid}
+.node{position:relative;display:grid;grid-template-columns:minmax(118px,.42fr) 1fr;gap:14px 24px;padding:26px 0 26px 30px;border-top:1px solid rgba(244,238,223,.18);cursor:default;transition:background .2s;min-width:0}
+.node::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:rgba(244,238,223,.18)}
+.node::after{content:"";position:absolute;left:-5px;top:30px;width:12px;height:10px;border-radius:6px;background:var(--felt);box-shadow:inset 0 0 0 2px rgba(244,238,223,.35);transition:background .25s,box-shadow .25s,transform .25s}
+.node:last-child{border-bottom:1px solid rgba(244,238,223,.18)}
+.node.is-on::after,.node:hover::after,.node:focus-within::after{background:var(--straw);box-shadow:inset 0 0 0 2px var(--straw);transform:scale(1.3)}
+.node .num{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3vw,2.5rem);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;color:var(--straw);text-wrap:balance}
+.node .num small{display:block;font-family:var(--mono);font-weight:400;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-media2);margin-top:8px;line-height:1.5}
+.node h3{font-size:clamp(1.05rem,1.6vw,1.35rem);font-weight:600;letter-spacing:0;color:var(--on-media)}
+.node p{color:var(--on-media2);margin-top:8px;max-width:48ch}
+@media (max-width:560px){.node{grid-template-columns:1fr;gap:8px}}
+.adv .foot{font-family:var(--mono);font-size:.72rem;color:var(--on-media2);margin-top:18px;line-height:1.6}
+.marquee{position:relative;border-top:1px solid rgba(244,238,223,.18);background:rgba(10,12,10,.6);overflow:hidden;white-space:nowrap;padding-block:16px}
+.marquee div{display:inline-block;font-family:var(--display);font-weight:600;font-size:clamp(1rem,2.4vw,1.5rem);letter-spacing:.04em;padding-right:1em;animation:slide 48s linear infinite}
+.marquee i{font-style:normal;color:var(--straw);padding:0 .55em}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- 05 buy ---------- */
+.buy{background:var(--bg)}
+.buy .cols{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(24px,4vw,56px);align-items:start}
+@media (max-width:980px){.buy .cols{grid-template-columns:1fr}}
+.calc,.order{background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 1px var(--line);padding:clamp(20px,3vw,32px);min-width:0}
+.calc h3,.order h3{font-size:1.1rem;font-weight:600;letter-spacing:0}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
+@media (max-width:560px){.fields{grid-template-columns:1fr}}
+.field{display:grid;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+label{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2)}
+.in{width:100%;border:0;border-radius:12px;padding:13px 14px;background:var(--input);color:var(--fg);font:inherit;font-variant-numeric:tabular-nums;box-shadow:inset 0 0 0 1px var(--line2);min-width:0}
+.in:focus{outline:2px solid var(--straw);outline-offset:0;box-shadow:none}
+select.in{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--fg2) 50%),linear-gradient(135deg,var(--fg2) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:38px}
+.opts{display:grid;gap:10px;margin-top:18px}
+.opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--input);box-shadow:inset 0 0 0 1px var(--line);cursor:pointer;font-family:var(--body);font-size:.98rem;letter-spacing:0;text-transform:none;color:var(--fg)}
+.opt input{accent-color:var(--straw);width:18px;height:18px;margin:0;flex:none}
+.opt span{flex:1;min-width:0}
+.opt b{font-family:var(--mono);font-weight:500;font-size:.85rem;font-variant-numeric:tabular-nums;color:var(--fg2);white-space:nowrap}
+.total{margin-top:22px;border-top:1px solid var(--line2);padding-top:18px;display:grid;gap:8px}
+.total div{display:flex;justify-content:space-between;gap:16px;font-variant-numeric:tabular-nums}
+.total span{color:var(--fg2)}
+.total .sum{align-items:baseline;margin-top:6px}
+.total .sum strong{font-family:var(--display);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;letter-spacing:-.01em}
+.total .sum span{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+.order .btn{width:100%;justify-content:center;margin-top:8px}
+.agree{font-size:.8rem;color:var(--fg3);margin-top:14px;line-height:1.5}
+.samples{margin-top:18px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:16px 18px;border-radius:16px;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--line)}
+.samples .sw{display:flex;gap:4px}
+.samples .sw i{width:34px;height:34px;border-radius:6px;background-size:cover;background-position:center;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.samples p{font-size:.92rem;color:var(--fg2)}
+.samples p b{color:var(--fg);font-weight:600}
+.samples .btn{padding:11px 16px}
+@media (max-width:560px){.samples{grid-template-columns:1fr}.samples .btn{width:100%;justify-content:center}}
+
+/* ---------- leads (owner / editors) ---------- */
+.leads{margin-top:clamp(28px,4vw,48px);background:var(--card);border-radius:20px;box-shadow:inset 0 0 0 1px var(--line);padding:clamp(20px,3vw,32px);min-width:0}
+.leads .bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.leads h3{font-size:1.1rem;font-weight:600;letter-spacing:0}
+.leads .cnt{font-family:var(--mono);font-size:.78rem;padding:5px 10px;border-radius:999px;background:var(--straw);color:var(--straw-ink);font-variant-numeric:tabular-nums}
+.leads .who{font-family:var(--mono);font-size:.72rem;color:var(--fg3)}
+.leads .bar .btn{margin-left:auto;padding:10px 16px}
+.leads .empty{color:var(--fg2);margin-top:14px}
+.tbl{overflow-x:auto;margin-top:16px}
+.tbl table{border-collapse:collapse;width:100%;min-width:820px;font-size:.92rem}
+.tbl th{font-family:var(--mono);font-weight:500;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg2);text-align:left;padding:10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.tbl td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top;font-variant-numeric:tabular-nums}
+.tbl td .sm{display:block;color:var(--fg2);font-size:.8rem;margin-top:2px;max-width:32ch;overflow-wrap:anywhere}
+.in.sm{padding:7px 30px 7px 10px;font-size:.85rem;border-radius:9px;background-position:calc(100% - 16px) 50%,calc(100% - 10px) 50%}
+.del{border:0;cursor:pointer;background:transparent;color:var(--fg2);font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:6px 8px;border-radius:8px;white-space:nowrap}
+.del:hover,.del[data-arm="1"]{color:var(--danger)}
+
+/* ---------- 06 showroom ---------- */
+.final{background:var(--felt);color:var(--on-media);overflow:hidden;padding-block:0}
+.final .media{position:absolute;inset:0}
+.final video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+.final .veil{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,12,10,.7),rgba(10,12,10,.45) 50%,rgba(10,12,10,.9))}
+.final .wrap{position:relative;padding-block:clamp(80px,12vw,160px)}
+.final .eyebrow b{color:var(--on-media2)}
+.final h2{font-size:clamp(2.2rem,6vw,5.2rem);font-weight:800;letter-spacing:-.025em;max-width:12ch}
+.final .lead{color:var(--on-media2)}
+.contacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:clamp(36px,5vw,56px)}
+@media (max-width:860px){.contacts{grid-template-columns:1fr}}
+.contact{padding:20px;border-radius:16px;background:rgba(10,12,10,.5);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(244,238,223,.18);min-width:0}
+.contact span{display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-media2)}
+.contact strong{display:block;font-family:var(--display);font-weight:600;font-size:1.05rem;margin-top:10px;letter-spacing:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.contact p{color:var(--on-media2);font-size:.92rem;margin-top:6px}
+.contact .copy{margin-top:12px;border:0;cursor:pointer;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border-radius:999px;background:rgba(244,238,223,.12);color:var(--on-media);box-shadow:inset 0 0 0 1px rgba(244,238,223,.25)}
+.contact .copy:hover{background:rgba(244,238,223,.22)}
+.footer{position:relative;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;padding:22px var(--gutter-r) calc(22px + env(safe-area-inset-bottom,0px)) var(--gutter-l);border-top:1px solid rgba(244,238,223,.18);font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--on-media2);background:rgba(10,12,10,.7)}
+.footer a{color:inherit}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:50;max-width:min(92vw,520px);padding:14px 20px;border-radius:14px;background:var(--straw);color:var(--straw-ink);font-weight:500;box-shadow:var(--shadow);transition:opacity .3s,transform .3s}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .hero .reveal{animation:none}
+  .marquee div{animation:none}
+  .card img,.card{transition:none}
+}
+</style>
+
+<header class="top">
+  <a class="mark" href="#s1" aria-label="Форма — на главный экран"><i></i>ФОРМА</a>
+  <nav class="nav" aria-label="Разделы">
+    <a href="#s2" data-nav="s2">Модели</a>
+    <a href="#s3" data-nav="s3">Характеристики</a>
+    <a href="#s4" data-nav="s4">Преимущества</a>
+    <a href="#s5" data-nav="s5">Купить</a>
+    <a href="#s6" data-nav="s6">Шоурум</a>
+  </nav>
+  <a class="btn btn-primary" href="#s5">Рассчитать</a>
+</header>
+
+<nav class="rail" aria-label="Экраны">
+  <a href="#s1" data-rail="s1"><span>01 · Главная</span></a>
+  <a href="#s2" data-rail="s2"><span>02 · Модели</span></a>
+  <a href="#s3" data-rail="s3"><span>03 · Характеристики</span></a>
+  <a href="#s4" data-rail="s4"><span>04 · Преимущества</span></a>
+  <a href="#s5" data-rail="s5"><span>05 · Купить</span></a>
+  <a href="#s6" data-rail="s6"><span>06 · Шоурум</span></a>
+</nav>
+
+<main>
+
+<!-- 01 -->
+<section class="screen hero" id="s1">
+  <div class="media" aria-hidden="true">
+    <video class="bgv" muted loop playsinline autoplay preload="metadata" poster="media/loop-hero-poster.jpg" data-loop="hero">
+      <source src="media/loop-hero.mp4" type="video/mp4">
+    </video>
+    <div class="veil"></div>
+  </div>
+  <div class="wrap">
+    <p class="eyebrow reveal"><b>01</b> Бамбуковые стеновые панели</p>
+    <h1 class="reveal">Стена из&nbsp;живого материала. <em>Твёрже дуба,</em> теплее бетона.</h1>
+    <p class="lead reveal">Двенадцать поверхностей — гладкие, рейка, рельеф и плетение. Режем под ваш размер, монтируем за день, образцы привозим завтра.</p>
+    <div class="cta reveal">
+      <a class="btn btn-primary" href="#s2">Выбрать модель</a>
+      <a class="btn btn-media" href="#s5">Рассчитать стоимость</a>
+    </div>
+    <div class="facts reveal">
+      <div><strong>от 3 900 ₽/м²</strong><span>цена материала</span></div>
+      <div><strong>12 моделей</strong><span>на складе</span></div>
+      <div><strong>1 день</strong><span>монтаж 20 м²</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="screen models" id="s2">
+  <div class="culms" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><b>02</b> Выбор модели</p>
+      <h2 class="h2">Двенадцать поверхностей</h2>
+      <p class="lead">Одно сырьё, двенадцать характеров. Выберите модель — расчёт в блоке покупки подставится сам. Все цены за квадратный метр без монтажа.</p>
+    </div>
+    <div class="chips" role="group" aria-label="Фильтр по типу">
+      <button class="chip is-on" data-filter="all">Все 12</button>
+      <button class="chip" data-filter="smooth">Гладкие</button>
+      <button class="chip" data-filter="slat">Рейка</button>
+      <button class="chip" data-filter="relief">Рельеф</button>
+      <button class="chip" data-filter="weave">Плетение</button>
+      <button class="chip" data-filter="special">Спецколлекция</button>
+    </div>
+    <div class="picked" id="picked" aria-live="polite">
+      <span>Выбрано:</span><b id="pickedName">Гладкая «Натур»</b><span class="price" id="pickedPrice">3 900 ₽/м²</span>
+      <a href="#s5">Рассчитать →</a>
+    </div>
+
+    <div class="grid" id="grid">
+      <article class="card is-picked" data-id="1" data-type="smooth" data-name="Гладкая «Натур»" data-price="3900" data-thick="12">
+        <figure><img src="media/m01.jpg" alt="Гладкая панель из бамбука натурального медового оттенка" loading="eager"><span class="tag">Гладкая</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Гладкая «Натур»</h3><p class="meta">Натуральный мёд · масло-воск<br>12 мм · 600 × 2400</p><div class="row"><span class="p">3 900 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="2" data-type="smooth" data-name="Гладкая «Карбон»" data-price="4200" data-thick="12">
+        <figure><img src="media/m02.jpg" alt="Гладкая карбонизированная бамбуковая панель тёмно-шоколадного цвета" loading="lazy"><span class="tag">Гладкая</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Гладкая «Карбон»</h3><p class="meta">Тёмный шоколад · матовый лак<br>12 мм · 600 × 2400</p><div class="row"><span class="p">4 200 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="3" data-type="smooth" data-name="Гладкая «Белёная»" data-price="4400" data-thick="12">
+        <figure><img src="media/m03.jpg" alt="Гладкая выбеленная бамбуковая панель светлого оттенка" loading="lazy"><span class="tag">Гладкая</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Гладкая «Белёная»</h3><p class="meta">Светлый лён · белое масло<br>12 мм · 600 × 2400</p><div class="row"><span class="p">4 400 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="4" data-type="slat" data-name="Рейка «Вертикаль»" data-price="5900" data-thick="18">
+        <figure><img src="media/m04.jpg" alt="Реечная бамбуковая панель с вертикальными ламелями на чёрном войлоке" loading="lazy"><span class="tag">Рейка</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Рейка «Вертикаль»</h3><p class="meta">Рейка 42 мм, шаг 60 · войлок<br>18 мм · 600 × 2400</p><div class="row"><span class="p">5 900 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="5" data-type="slat" data-name="Рейка «Карбон»" data-price="6200" data-thick="18">
+        <figure><img src="media/m05.jpg" alt="Реечная панель из тёмного карбонизированного бамбука" loading="lazy"><span class="tag">Рейка</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Рейка «Карбон»</h3><p class="meta">Тёмная рейка 42 мм · войлок<br>18 мм · 600 × 2400</p><div class="row"><span class="p">6 200 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="6" data-type="relief" data-name="Рифлёная «Волна»" data-price="5400" data-thick="18">
+        <figure><img src="media/m06.jpg" alt="Рельефная бамбуковая панель с плавными вертикальными волнами" loading="lazy"><span class="tag">Рельеф</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Рифлёная «Волна»</h3><p class="meta">3D-волна, шаг 150 · масло<br>18 мм · 600 × 2400</p><div class="row"><span class="p">5 400 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="7" data-type="relief" data-name="Рифлёная «Кант»" data-price="5100" data-thick="14">
+        <figure><img src="media/m07.jpg" alt="Мелкорифлёная бамбуковая панель с узкими округлыми рёбрами" loading="lazy"><span class="tag">Рельеф</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Рифлёная «Кант»</h3><p class="meta">Ребро 26 мм, без зазора · лак<br>14 мм · 600 × 2400</p><div class="row"><span class="p">5 100 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="8" data-type="weave" data-name="Плетение «Рогожка»" data-price="4700" data-thick="10">
+        <figure><img src="media/m08.jpg" alt="Плетёная бамбуковая панель с переплетением полос в шахматном порядке" loading="lazy"><span class="tag">Плетение</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Плетение «Рогожка»</h3><p class="meta">Полоса 76 мм, корзинное плетение<br>10 мм · 600 × 2400</p><div class="row"><span class="p">4 700 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="9" data-type="weave" data-name="Плетение «Ёлочка»" data-price="4900" data-thick="10">
+        <figure><img src="media/m09.jpg" alt="Бамбуковая панель с диагональной укладкой полос ёлочкой" loading="lazy"><span class="tag">Плетение</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Плетение «Ёлочка»</h3><p class="meta">Диагональ 45°, два тона<br>10 мм · 600 × 2400</p><div class="row"><span class="p">4 900 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="10" data-type="special" data-name="Мозаика «Срез»" data-price="6800" data-thick="16">
+        <figure><img src="media/m10.jpg" alt="Мозаичная панель из торцевых срезов бамбуковых стеблей" loading="lazy"><span class="tag">Спец</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Мозаика «Срез»</h3><p class="meta">Торцевые срезы Ø 40 на сетке<br>16 мм · 300 × 300</p><div class="row"><span class="p">6 800 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="11" data-type="special" data-name="Стебель «Полукруг»" data-price="5600" data-thick="22">
+        <figure><img src="media/m11.jpg" alt="Панель из половинок бамбуковых стеблей с узлами" loading="lazy"><span class="tag">Спец</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Стебель «Полукруг»</h3><p class="meta">Половинки стебля Ø 50–60<br>22 мм · 600 × 2400</p><div class="row"><span class="p">5 600 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+      <article class="card" data-id="12" data-type="slat" data-name="Акустик «Тишина»" data-price="7400" data-thick="21">
+        <figure><img src="media/m12.jpg" alt="Акустическая реечная панель из светлого бамбука на сером войлоке" loading="lazy"><span class="tag">Акустик</span><span class="ok">Выбрано</span></figure>
+        <div class="body"><h3>Акустик «Тишина»</h3><p class="meta">Рейка 28 мм, шаг 40 · войлок 9 мм<br>21 мм · 600 × 2400</p><div class="row"><span class="p">7 400 ₽ <small>/ м²</small></span><button class="pick" type="button">Выбрать</button></div></div>
+      </article>
+    </div>
+    <p class="note">Размер панели по умолчанию 600 × 2400 мм (1,44 м²). Любую модель режем по вашим размерам в пределах листа. Цвет на экране отличается от живого материала — закажите образцы.</p>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="screen specs" id="s3">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><b>03</b> Характеристики</p>
+      <h2 class="h2">Паспорт материала</h2>
+      <p class="lead">Прессованный бамбук: ламели из стебля Moso, склеенные под давлением и облицованные шпоном. Ниже — типовые значения; точные цифры по партии есть в сертификате.</p>
+    </div>
+    <div class="cols">
+      <dl class="sheet">
+        <div><dt>Сырьё</dt><dd>Бамбук Phyllostachys edulis (Moso), возраст 4–5 лет<small>Плантации Фуцзянь, FSC-сертификат</small></dd></div>
+        <div><dt>Толщина</dt><dd>10 / 12 / 14 / 16 / 18 / 21 / 22 мм<small>зависит от модели, см. карточку</small></dd></div>
+        <div><dt>Формат</dt><dd>600 × 2400 мм · «Срез» — 300 × 300<small>резка по размеру: ±1 мм</small></dd></div>
+        <div><dt>Плотность</dt><dd>850–1 100 кг/м³</dd></div>
+        <div><dt>Твёрдость</dt><dd>4,0 HB по Бринеллю<small>дуб — 3,7 HB, сосна — 1,6 HB</small></dd></div>
+        <div><dt>Влажность</dt><dd>8 ± 2 % при поставке<small>эксплуатация при 40–60 % RH</small></dd></div>
+        <div><dt>Эмиссия</dt><dd>Класс E0,5 (≤ 0,05 мг/м³)<small>клей без формальдегида</small></dd></div>
+        <div><dt>Горючесть</dt><dd>КМ3 · с огнезащитной пропиткой — КМ2<small>под заказ, от 20 м²</small></dd></div>
+        <div><dt>Покрытие</dt><dd>Масло-воск, матовый УФ-лак или без покрытия</dd></div>
+        <div><dt>Монтаж</dt><dd>Клей, кляймер, саморез в паз<small>стены, потолки, фасады мебели</small></dd></div>
+        <div><dt>Вес</dt><dd>6–11 кг/м²</dd></div>
+      </dl>
+      <div>
+        <svg class="section-svg" viewBox="0 0 560 360" role="img" aria-labelledby="svgT">
+          <title id="svgT">Сечение панели: покрытие, лицевой слой, основа, войлок</title>
+          <!-- exploded layers, each a slanted slab -->
+          <g class="coat"><polygon points="60,74 300,44 420,70 180,100"/></g>
+          <g class="lam"><polygon points="60,112 300,82 420,108 180,138"/><polygon class="lam2" points="180,138 420,108 420,122 180,152"/><polygon class="lam2" points="60,112 180,138 180,152 60,126"/></g>
+          <g class="base"><polygon points="60,170 300,140 420,166 180,196"/><polygon points="180,196 420,166 420,198 180,228"/><polygon points="60,170 180,196 180,228 60,202"/></g>
+          <g class="felt"><polygon points="60,250 300,220 420,246 180,276"/><polygon points="180,276 420,246 420,262 180,292"/><polygon points="60,250 180,276 180,292 60,266"/></g>
+          <!-- slats on top of lam layer to show relief family -->
+          <g class="lam2" opacity=".55"><polygon points="115.2,117.4 151.2,112.9 165.6,116 129.6,120.5"/><polygon points="168,110.8 204,106.3 218.4,109.4 182.4,113.9"/><polygon points="220.8,104.2 256.8,99.7 271.2,102.8 235.2,107.3"/><polygon points="273.6,97.6 309.6,93.1 324,96.2 288,100.7"/></g>
+          <!-- leaders -->
+          <g class="lead"><line x1="300" y1="44" x2="470" y2="44"/><line x1="300" y1="82" x2="470" y2="82"/><line x1="300" y1="140" x2="470" y2="140"/><line x1="300" y1="220" x2="470" y2="220"/></g>
+          <g><circle class="dot" cx="300" cy="44" r="3"/><circle class="dot" cx="300" cy="82" r="3"/><circle class="dot" cx="300" cy="140" r="3"/><circle class="dot" cx="300" cy="220" r="3"/></g>
+          <g>
+            <text x="476" y="40">Покрытие</text><text x="476" y="54" class="dim">масло-воск · 0,1 мм</text>
+            <text x="476" y="78">Лицевой слой</text><text x="476" y="92" class="dim">ламели бамбука · 4 мм</text>
+            <text x="476" y="136">Основа</text><text x="476" y="150" class="dim">прессованный бамбук · 8 мм</text>
+            <text x="476" y="216">Войлок</text><text x="476" y="230" class="dim">акустик · 9 мм (рейка)</text>
+          </g>
+          <!-- dimension of panel -->
+          <g class="lead"><line x1="60" y1="318" x2="420" y2="318"/><line x1="60" y1="312" x2="60" y2="324"/><line x1="420" y1="312" x2="420" y2="324"/></g>
+          <text x="240" y="340" class="dim" text-anchor="middle">600 мм · лист 2400 мм</text>
+        </svg>
+        <div class="closeup">
+          <video class="bgv" muted loop playsinline preload="none" poster="media/loop-culm-poster.jpg" data-loop="culm">
+            <source src="media/loop-culm.mp4" type="video/mp4">
+          </video>
+          <span class="cap">Стебель «Полукруг» · узлы 1:1</span>
+        </div>
+      </div>
+    </div>
+    <div class="conds">
+      <div class="cond"><strong>+5…+35 °C</strong><span>температура в помещении</span></div>
+      <div class="cond"><strong>40–60 % RH</strong><span>влажность воздуха, без прямой воды</span></div>
+      <div class="cond"><strong>0,17 Вт/м·К</strong><span>теплопроводность, в 10 раз ниже бетона</span></div>
+      <div class="cond"><strong>25 лет</strong><span>гарантия на геометрию при соблюдении режима</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section class="screen adv" id="s4">
+  <div class="bgs" aria-hidden="true">
+    <video class="bgv is-on" muted loop playsinline preload="none" poster="media/loop-dark-poster.jpg" data-loop="dark" data-bg="0">
+      <source src="media/loop-dark.mp4" type="video/mp4">
+    </video>
+    <img src="media/adv-fluted.jpg" alt="" loading="lazy" data-bg="1">
+    <img src="media/adv-endgrain.jpg" alt="" loading="lazy" data-bg="2">
+    <img src="media/adv-wave.jpg" alt="" loading="lazy" data-bg="3">
+    <img src="media/adv-bleached.jpg" alt="" loading="lazy" data-bg="4">
+    <img src="media/adv-herringbone.jpg" alt="" loading="lazy" data-bg="5">
+    <img src="media/adv-acoustic.jpg" alt="" loading="lazy" data-bg="6">
+  </div>
+  <div class="wrap">
+    <div class="sticky">
+      <p class="eyebrow"><b>04</b> Преимущества</p>
+      <h2 class="h2">Почему стебель, а&nbsp;не&nbsp;ствол</h2>
+      <p class="lead" style="margin-top:18px">Бамбук — трава, а не дерево. Из этого следует почти всё: скорость роста, плотность волокна, стабильность в комнате с батареями. Наведите на узел.</p>
+      <p class="foot">Справочные значения для прессованного бамбука Moso. Сравнение с дубом и сосной — по ГОСТ-методикам Бринелля.</p>
+    </div>
+    <ol class="nodes" id="nodes">
+      <li class="node is-on" data-bg="1" tabindex="0"><div class="num">90 см<small>прирост за сутки</small></div><div><h3>Растёт быстрее, чем вырубается</h3><p>Зрелость за 4–5 лет против 60–80 у дуба. После среза корневище даёт новые побеги — плантация не оголяется.</p></div></li>
+      <li class="node" data-bg="2" tabindex="0"><div class="num">4,0 HB<small>твёрдость по Бринеллю</small></div><div><h3>Твёрже дуба</h3><p>Прессованное волокно держит удар стула, когти собаки и детский самокат. Дуб — 3,7 HB, сосна — 1,6.</p></div></li>
+      <li class="node" data-bg="3" tabindex="0"><div class="num">0,17<small>Вт/м·К, теплопроводность</small></div><div><h3>Тёплый на ощупь</h3><p>В десять раз ниже бетона. Стена в прихожей и у окна не холодит ладонь даже зимой.</p></div></li>
+      <li class="node" data-bg="4" tabindex="0"><div class="num">E0,5<small>класс эмиссии</small></div><div><h3>Можно в спальню и детскую</h3><p>Клей без формальдегида, покрытие на натуральном масле. Запаха нет уже в день монтажа.</p></div></li>
+      <li class="node" data-bg="5" tabindex="0"><div class="num">1 день<small>монтаж 20 м²</small></div><div><h3>Без пыли и мокрых процессов</h3><p>Клей, кляймер или скрытый паз. Утром привезли — вечером можно вешать полки.</p></div></li>
+      <li class="node" data-bg="6" tabindex="0"><div class="num">α<sub>w</sub> 0,6<small>звукопоглощение «Акустик»</small></div><div><h3>Гасит эхо</h3><p>Рейка на войлоке 9 мм — класс C по ISO 11654. Для гостиной с телевизором и переговорных.</p></div></li>
+    </ol>
+  </div>
+  <div class="marquee" aria-hidden="true"><div>Гладкие<i>·</i>Рейка<i>·</i>Рельеф<i>·</i>Плетение<i>·</i>Карбон<i>·</i>Белёная<i>·</i>Акустик<i>·</i>Срез<i>·</i>Полукруг<i>·</i>Гладкие<i>·</i>Рейка<i>·</i>Рельеф<i>·</i>Плетение<i>·</i>Карбон<i>·</i>Белёная<i>·</i>Акустик<i>·</i>Срез<i>·</i>Полукруг<i>·</i></div></div>
+</section>
+
+<!-- 05 -->
+<section class="screen buy" id="s5">
+  <div class="culms" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow"><b>05</b> Покупка</p>
+      <h2 class="h2">Считаем по вашей стене</h2>
+      <p class="lead">Введите размеры — покажем количество листов с запасом 7 % на подрезку и итоговую сумму. Заявка уходит менеджеру, перезвоним в течение 15 минут в рабочее время.</p>
+    </div>
+    <div class="cols">
+      <div class="calc">
+        <h3>Калькулятор</h3>
+        <div class="fields">
+          <div class="field full"><label for="model">Модель</label><select class="in" id="model"></select></div>
+          <div class="field"><label for="w">Ширина стены, м</label><input class="in" id="w" type="number" inputmode="decimal" min="0.3" max="60" step="0.1" value="4.2"></div>
+          <div class="field"><label for="h">Высота стены, м</label><input class="in" id="h" type="number" inputmode="decimal" min="0.3" max="12" step="0.1" value="2.7"></div>
+          <div class="field full"><label for="open">Проёмы (окна, двери), м²</label><input class="in" id="open" type="number" inputmode="decimal" min="0" max="500" step="0.1" value="0"></div>
+        </div>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" id="install" checked><span>Монтаж нашей бригадой</span><b>1 200 ₽/м²</b></label>
+          <label class="opt"><input type="radio" name="dlv" id="dlv0" value="0" checked><span>Самовывоз со склада</span><b>0 ₽</b></label>
+          <label class="opt"><input type="radio" name="dlv" id="dlv1" value="1500"><span>Доставка по городу</span><b>1 500 ₽</b></label>
+          <label class="opt"><input type="radio" name="dlv" id="dlv2" value="tk"><span>Транспортная компания по России</span><b>по тарифу ТК</b></label>
+        </div>
+        <div class="total" aria-live="polite">
+          <div><span>Площадь</span><span id="tArea">—</span></div>
+          <div><span>Листов 600 × 2400 с запасом 7 %</span><span id="tSheets">—</span></div>
+          <div><span>Материал</span><span id="tMat">—</span></div>
+          <div><span>Монтаж</span><span id="tInst">—</span></div>
+          <div><span>Доставка</span><span id="tDlv">—</span></div>
+          <div><span>Вес груза ≈</span><span id="tWeight">—</span></div>
+          <div class="sum"><span>Итого</span><strong id="tSum">—</strong></div>
+        </div>
+      </div>
+      <div>
+        <form class="order" id="order" novalidate>
+          <h3>Заявка на расчёт</h3>
+          <div class="fields">
+            <div class="field full"><label for="name">Как к вам обращаться</label><input class="in" id="name" type="text" autocomplete="name" placeholder="Имя"></div>
+            <div class="field full"><label for="phone">Телефон</label><input class="in" id="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 ___ ___-__-__"></div>
+            <div class="field full"><label for="comment">Комментарий</label><textarea class="in" id="comment" rows="3" placeholder="Город, сроки, нужен ли выезд замерщика"></textarea></div>
+          </div>
+          <input type="hidden" id="calcSummary">
+          <button class="btn btn-primary" type="submit">Отправить расчёт</button>
+          <p class="agree">Нажимая кнопку, вы соглашаетесь на обработку персональных данных. Без спама и рассылок — только звонок по вашему расчёту.</p>
+        </form>
+        <div class="samples">
+          <div class="sw"><i style="background-image:url('media/m01.jpg')"></i><i style="background-image:url('media/m05.jpg')"></i><i style="background-image:url('media/m08.jpg')"></i></div>
+          <p><b>Три образца 100 × 100 мм — 490 ₽.</b> Любые модели на выбор, доставка курьером на следующий день. Сумму зачтём в заказ.</p>
+          <button class="btn btn-ghost" type="button" id="samplesBtn">Образцы</button>
+        </div>
+      </div>
+    </div>
+    <div class="leads" id="leads" hidden>
+      <div class="bar"><h3>Заявки</h3><span class="cnt" id="leadsCnt">0</span><span class="who">видно только владельцу и редакторам страницы</span><button class="btn btn-ghost" type="button" id="csvBtn">Скачать CSV</button></div>
+      <p class="empty" id="leadsEmpty">Пока нет заявок. Отправьте тестовую через форму выше — она появится здесь.</p>
+      <div class="tbl" id="leadsTbl" hidden><table><thead><tr><th>Дата</th><th>Клиент</th><th>Модель</th><th>Стена</th><th>Итого</th><th>Статус</th><th></th></tr></thead><tbody id="leadsBody"></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section class="screen final" id="s6">
+  <div class="media" aria-hidden="true">
+    <video class="bgv" muted loop playsinline preload="none" poster="media/loop-woven-poster.jpg" data-loop="woven">
+      <source src="media/loop-woven.mp4" type="video/mp4">
+    </video>
+    <div class="veil"></div>
+  </div>
+  <div class="wrap">
+    <p class="eyebrow"><b>06</b> Шоурум</p>
+    <h2>Приходите потрогать</h2>
+    <p class="lead" style="margin-top:22px">Все двенадцать моделей на стенах в натуральную величину, при дневном и тёплом свете. Привозите план квартиры — посчитаем на месте и дадим образцы с собой.</p>
+    <div class="contacts">
+      <div class="contact"><span>Адрес</span><strong>Москва, Дизайн-квартал, корпус 3, 2 этаж</strong><p>Парковка во дворе, вход со стороны набережной</p></div>
+      <div class="contact"><span>Часы работы</span><strong>Пн–Сб 10:00–20:00</strong><p>Воскресенье — по записи</p></div>
+      <div class="contact"><span>Телефон</span><strong id="phoneText">+7 495 000-00-00</strong><p>Звонок, Telegram, WhatsApp</p><button class="copy" type="button" id="copyPhone">Скопировать номер</button></div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>© 2026 Форма · бамбуковые стеновые панели</span>
+    <span>Фото и видео на странице — демонстрационные</span>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const fmt=n=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(Math.round(n))+' ₽';
+  const fmt2=n=>new Intl.NumberFormat('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1}).format(n);
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* models */
+  const cards=$$('.card');
+  const models=cards.map(c=>({id:+c.dataset.id,name:c.dataset.name,price:+c.dataset.price,thick:+c.dataset.thick,type:c.dataset.type,el:c}));
+  const sel=$('#model');
+  models.forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=m.name+' — '+fmt(m.price)+'/м²';sel.appendChild(o);});
+  let current=models[0];
+  function pick(id,scroll){
+    current=models.find(m=>m.id===+id)||models[0];
+    cards.forEach(c=>c.classList.toggle('is-picked',+c.dataset.id===current.id));
+    $('#pickedName').textContent=current.name;
+    $('#pickedPrice').textContent=fmt(current.price)+'/м²';
+    if(sel.value!==String(current.id)) sel.value=current.id;
+    calc();
+    if(scroll) $('#s5').scrollIntoView({behavior:reduced?'auto':'smooth'});
+  }
+  cards.forEach(c=>{
+    c.addEventListener('click',e=>{ if(e.target.closest('.pick')) pick(c.dataset.id,true); else pick(c.dataset.id,false); });
+  });
+  sel.addEventListener('change',()=>pick(sel.value,false));
+
+  /* filter */
+  $$('.chip').forEach(ch=>ch.addEventListener('click',()=>{
+    $$('.chip').forEach(x=>x.classList.toggle('is-on',x===ch));
+    const f=ch.dataset.filter;
+    cards.forEach(c=>{c.hidden=!(f==='all'||c.dataset.type===f);});
+  }));
+
+  /* calculator */
+  const w=$('#w'),h=$('#h'),open=$('#open'),inst=$('#install');
+  const SHEET=0.6*2.4, RESERVE=1.07, INSTALL=1200, KG=8.5;
+  let last={};
+  function calc(){
+    const W=Math.max(0,parseFloat(w.value)||0), H=Math.max(0,parseFloat(h.value)||0), O=Math.max(0,parseFloat(open.value)||0);
+    const area=Math.max(0,W*H-O);
+    const sheets=Math.ceil(area*RESERVE/SHEET);
+    const mat=sheets*SHEET*current.price;
+    const ins=inst.checked?area*INSTALL:0;
+    const d=($$('input[name=dlv]').find(r=>r.checked)||{}).value;
+    const dlv=d==='tk'?0:(+d||0);
+    const sum=mat+ins+dlv;
+    const dText=d==='tk'?'транспортная компания':(d==='1500'?'по городу':'самовывоз');
+    last={W,H,O,area,sheets,mat,ins,dlv,sum,tk:d==='tk',dText};
+    $('#tArea').textContent=fmt2(area)+' м²';
+    $('#tSheets').textContent=sheets+' шт · '+fmt2(sheets*SHEET)+' м²';
+    $('#tMat').textContent=fmt(mat);
+    $('#tInst').textContent=inst.checked?fmt(ins):'без монтажа';
+    $('#tDlv').textContent=d==='tk'?'по тарифу ТК':fmt(dlv);
+    $('#tWeight').textContent=Math.round(sheets*SHEET*KG)+' кг';
+    $('#tSum').textContent=fmt(sum)+(d==='tk'?' + ТК':'');
+    $('#calcSummary').value=current.name+'; '+W+'×'+H+' м, проёмы '+O+' м²; '+sheets+' листов; '+(inst.checked?'с монтажом':'без монтажа')+'; '+fmt(sum);
+  }
+  [w,h,open,inst,...$$('input[name=dlv]')].forEach(el=>el.addEventListener('input',calc));
+  calc();
+
+  /* order form */
+  const toast=$('#toast'); let tt;
+  function say(msg){toast.textContent=msg;toast.classList.add('is-on');clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove('is-on'),4200);}
+  $('#order').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const name=$('#name').value.trim(), phoneRaw=$('#phone').value.trim(), phone=phoneRaw.replace(/\D/g,'');
+    if(!name){say('Напишите, как к вам обращаться.');$('#name').focus();return;}
+    if(phone.length<10){say('Проверьте телефон: нужно не меньше 10 цифр.');$('#phone').focus();return;}
+    const lead={name,phone:phoneRaw,comment:$('#comment').value.trim(),model:current.name,modelId:current.id,pricePerM2:current.price,
+      width:last.W,height:last.H,openings:last.O,area:Math.round(last.area*10)/10,sheets:last.sheets,install:inst.checked,delivery:last.dText,
+      total:Math.round(last.sum),totalText:fmt(last.sum)+(last.tk?' + ТК':''),status:'new',createdAt:new Date().toISOString(),createdTs:Date.now()};
+    if(db&&canWrite!==false){
+      const btn=$('#order button[type=submit]'); btn.disabled=true;
+      try{ const ref=await db.collection('leads').add(lead); say('Заявка сохранена, '+name+'. Номер '+ref.id.slice(-6).toUpperCase()+'. Перезвоним в течение 15 минут.'); $('#order').reset(); }
+      catch(err){
+        const code=err&&err.code;
+        if(code==='invalid_argument'){canWrite=false; say('Заявка оформлена в демо-режиме: у этого просмотра нет прав сохранять данные.');}
+        else if(code==='quota_exceeded'){say('Хранилище заявок заполнено — удалите старые записи в списке ниже.');}
+        else {say('Не удалось сохранить заявку, попробуйте ещё раз.');}
+      } finally{btn.disabled=false;}
+      return;
+    }
+    say('Заявка оформлена в демо-режиме (не сохраняется), '+name+'. На рабочем сайте она уйдёт в CRM.');
+    $('#order').reset();
+  });
+  $('#samplesBtn').addEventListener('click',()=>{
+    const c=$('#comment'); if(!/образц/i.test(c.value)) c.value=(c.value?c.value+'\n':'')+'Хочу 3 образца 100×100: '+current.name+' и ещё две модели на ваш выбор.';
+    $('#name').focus({preventScroll:true}); $('#order').scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+  });
+
+  /* ---- leads: kept in the page's own store (db capability), visible to owner and editors ---- */
+  let db=null, canWrite=null, isAdmin=false, downloads=null, leadsCache=[];
+  const leadsBox=$('#leads'), leadsBody=$('#leadsBody'), leadsCnt=$('#leadsCnt'), leadsEmpty=$('#leadsEmpty'), leadsTbl=$('#leadsTbl');
+  const STATUS={new:'Новая',work:'В работе',done:'Закрыта'};
+  const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function renderLeads(docs){
+    leadsCache=docs.map(d=>Object.assign({id:d.id},d.data()));
+    leadsCnt.textContent=leadsCache.length;
+    leadsEmpty.hidden=leadsCache.length>0; leadsTbl.hidden=leadsCache.length===0;
+    leadsBody.innerHTML=leadsCache.map(l=>{
+      const dt=l.createdAt?new Date(l.createdAt):null;
+      const ds=dt&&!isNaN(dt)?dt.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+      const opts=Object.entries(STATUS).map(([k,v])=>'<option value="'+k+'"'+((l.status||'new')===k?' selected':'')+'>'+v+'</option>').join('');
+      return '<tr data-id="'+esc(l.id)+'"><td>'+esc(ds)+'</td><td>'+esc(l.name)+'<span class="sm">'+esc(l.phone)+'</span>'+(l.comment?'<span class="sm">'+esc(l.comment)+'</span>':'')+'</td><td>'+esc(l.model)+'</td><td>'+esc(l.width)+' × '+esc(l.height)+' м<span class="sm">'+esc(l.area)+' м² · '+esc(l.sheets)+' лист.</span></td><td>'+esc(l.totalText)+'<span class="sm">'+(l.install?'с монтажом':'без монтажа')+' · '+esc(l.delivery)+'</span></td><td><select class="in sm" data-act="status" aria-label="Статус заявки">'+opts+'</select></td><td><button class="del" type="button" data-act="del">Удалить</button></td></tr>';
+    }).join('');
+  }
+  leadsBody.addEventListener('change',async e=>{
+    const sel=e.target.closest('select[data-act=status]'); if(!sel||!db) return;
+    const id=sel.closest('tr').dataset.id;
+    try{await db.doc('leads/'+id).update({status:sel.value});}catch(err){say('Не удалось изменить статус.');}
+  });
+  leadsBody.addEventListener('click',async e=>{
+    const b=e.target.closest('button[data-act=del]'); if(!b||!db) return;
+    if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='Точно удалить?';setTimeout(()=>{b.dataset.arm='';b.textContent='Удалить';},3000);return;}
+    const id=b.closest('tr').dataset.id;
+    try{await db.doc('leads/'+id).delete();}catch(err){say('Не удалось удалить заявку.');}
+  });
+  function leadsCsv(){
+    const H=['Дата','Имя','Телефон','Комментарий','Модель','Ширина, м','Высота, м','Проёмы, м²','Площадь, м²','Листов','Монтаж','Доставка','Итого, ₽','Статус'];
+    const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+    const rows=leadsCache.map(l=>[l.createdAt?new Date(l.createdAt).toLocaleString('ru-RU'):'',l.name,l.phone,l.comment,l.model,l.width,l.height,l.openings,l.area,l.sheets,l.install?'да':'нет',l.delivery,l.total,STATUS[l.status]||l.status].map(q).join(';'));
+    return '\uFEFF'+[H.join(';')].concat(rows).join('\r\n');
+  }
+  $('#csvBtn').addEventListener('click',async()=>{
+    const data=leadsCsv();
+    if(downloads){ try{ await downloads.save({filename:'forma-zayavki.csv',data}); return; }catch(err){ if(err&&err.code==='cancelled') return; } }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(data).then(()=>say('CSV скопирован в буфер обмена — вставьте в таблицу.'),()=>say('Не удалось скопировать CSV.')); }
+    else say('Скачивание недоступно в этом просмотре.');
+  });
+  (async()=>{
+    if(!window.claude||typeof window.claude.use!=='function') return;
+    const [d,u,dl]=await Promise.all([window.claude.use('db'),window.claude.use('user'),window.claude.use('downloads')]);
+    db=d; downloads=dl;
+    if(!downloads) $('#csvBtn').textContent='Скопировать CSV';
+    if(u){ try{ isAdmin=await u.canEdit(); canWrite=await u.can('data.write'); }catch(err){} }
+    if(db&&isAdmin){
+      leadsBox.hidden=false;
+      db.collection('leads').orderBy('createdTs','desc').limit(200).onSnapshot(snap=>renderLeads(snap.docs),err=>{ if(err&&err.code!=='revoked') say('Список заявок сейчас недоступен.'); });
+    }
+  })();
+
+  /* phone copy */
+  $('#copyPhone').addEventListener('click',()=>{
+    const t=$('#phoneText').textContent;
+    const done=()=>say('Номер скопирован: '+t);
+    const fallback=()=>{const r=document.createRange();r.selectNodeContents($('#phoneText'));const s=getSelection();s.removeAllRanges();s.addRange(r);say('Номер выделен — скопируйте вручную.');};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback);} else fallback();
+  });
+
+  /* advantages: node hover swaps background */
+  const bgs=$$('.adv .bgs [data-bg]'), nodes=$$('.node');
+  function showBg(i){bgs.forEach(b=>b.classList.toggle('is-on',b.dataset.bg===String(i)));nodes.forEach(n=>n.classList.toggle('is-on',n.dataset.bg===String(i)));}
+  nodes.forEach(n=>{['mouseenter','focus'].forEach(ev=>n.addEventListener(ev,()=>showBg(n.dataset.bg)));});
+  $('#nodes').addEventListener('mouseleave',()=>showBg(nodes.find(n=>n.classList.contains('is-on'))?.dataset.bg||1));
+  /* on touch devices, the node in view drives the background */
+  if(!window.matchMedia('(hover:hover)').matches&&'IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>0.6) showBg(e.target.dataset.bg);});},{threshold:[0.6]});
+    nodes.forEach(n=>io.observe(n));
+  }
+
+  /* video loops: play only near the viewport */
+  const vids=$$('video.bgv');
+  if(reduced){ vids.forEach(v=>{v.removeAttribute('autoplay');v.pause();}); }
+  else if('IntersectionObserver' in window){
+    const vo=new IntersectionObserver(es=>{es.forEach(e=>{const v=e.target;
+      if(e.isIntersecting){ if(v.preload!=='auto') v.preload='auto'; const p=v.play(); if(p&&p.catch) p.catch(()=>{}); }
+      else v.pause(); });},{rootMargin:'240px 0px'});
+    vids.forEach(v=>vo.observe(v));
+  } else { vids.forEach(v=>{v.preload='auto';const p=v.play();if(p&&p.catch)p.catch(()=>{});}); }
+
+  /* rail + nav: current screen */
+  const screens=$$('.screen'), rails=$$('[data-rail]'), navs=$$('[data-nav]');
+  function mark(id){rails.forEach(a=>a.classList.toggle('is-active',a.dataset.rail===id));navs.forEach(a=>a.classList.toggle('is-active',a.dataset.nav===id));}
+  if('IntersectionObserver' in window){
+    const so=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting) mark(e.target.id);});},{rootMargin:'-45% 0px -45% 0px'});
+    screens.forEach(s=>so.observe(s));
+  }
+  mark('s1');
+
+  /* top bar turns solid once the hero is scrolled past */
+  const top=$('.top'); let ticking=false;
+  function onScroll(){ticking=false;top.classList.toggle('is-scrolled',window.scrollY>window.innerHeight*0.6);}
+  window.addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(onScroll);}},{passive:true});
+  onScroll();
+})();
+</script>
+
+</body></html>
