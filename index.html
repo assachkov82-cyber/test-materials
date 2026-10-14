@@ -1,6 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Форма Бамбук</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -241,6 +244,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:linear-gradie
 .total .sum span{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
 .order .btn{width:100%;justify-content:center;margin-top:8px}
 .agree{font-size:.8rem;color:var(--fg3);margin-top:14px;line-height:1.5}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .samples{margin-top:18px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:16px 18px;border-radius:16px;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--line)}
 .samples .sw{display:flex;gap:4px}
 .samples .sw i{width:34px;height:34px;border-radius:6px;background-size:cover;background-position:center;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
@@ -296,7 +300,10 @@ select.in{appearance:none;-webkit-appearance:none;background-image:linear-gradie
   .marquee div{animation:none}
   .card img,.card{transition:none}
 }
+[hidden]{display:none!important}
 </style>
+</head>
+<body>
 
 <header class="top">
   <a class="mark" href="#s1" aria-label="Форма — на главный экран"><i></i>ФОРМА</a>
@@ -558,6 +565,7 @@ select.in{appearance:none;-webkit-appearance:none;background-image:linear-gradie
             <div class="field full"><label for="comment">Комментарий</label><textarea class="in" id="comment" rows="3" placeholder="Город, сроки, нужен ли выезд замерщика"></textarea></div>
           </div>
           <input type="hidden" id="calcSummary">
+          <input class="hp" type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <button class="btn btn-primary" type="submit">Отправить расчёт</button>
           <p class="agree">Нажимая кнопку, вы соглашаетесь на обработку персональных данных. Без спама и рассылок — только звонок по вашему расчёту.</p>
         </form>
@@ -686,6 +694,16 @@ select.in{appearance:none;-webkit-appearance:none;background-image:linear-gradie
       } finally{btn.disabled=false;}
       return;
     }
+    /* свой хостинг (Vercel и т.п.): заявка уходит в /api/lead → Telegram */
+    const sbtn=$('#order button[type=submit]'); sbtn.disabled=true;
+    try{
+      const r=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({website:$('#website').value},lead))});
+      if(r.ok){ say('Заявка отправлена, '+name+'. Перезвоним в течение 15 минут в рабочее время.'); $('#order').reset(); return; }
+      if(r.status===503){ say('Приём заявок на сервере ещё не настроен. Позвоните нам: '+$('#phoneText').textContent); return; }
+      if(r.status===400){ say('Проверьте имя и телефон и отправьте ещё раз.'); return; }
+      if(r.status!==404){ say('Не удалось отправить заявку. Попробуйте ещё раз или позвоните.'); return; }
+    }catch(err){ /* сервера нет (локальный файл) — ниже демо-режим */ }
+    finally{ sbtn.disabled=false; }
     say('Заявка оформлена в демо-режиме (не сохраняется), '+name+'. На рабочем сайте она уйдёт в CRM.');
     $('#order').reset();
   });
@@ -791,4 +809,5 @@ select.in{appearance:none;-webkit-appearance:none;background-image:linear-gradie
 })();
 </script>
 
-</body></html>
+</body>
+</html>
